@@ -1,0 +1,220 @@
+Creation of the App
+building an application with the following components.
+
+<app-root>—the first component to load and the container for the other components. --> app.component.html file
+<app-top-bar>—the store name and checkout button.
+<app-product-list>—the product list.
+<app-product-alerts>—a component that contains the application's alerts.
+
+1. a top bar with the store name, My Store, and a checkout button
+2. a header for a product list, Products
+
+src/app/product-list/product-list.component.html
+
+3. Add an *ngFor structural directive : With *ngFor, the <div> repeats for each product in the list.
+   Structural directives shape or reshape the DOM's structure, by adding, removing, and manipulating elements.
+4. The {{ product.name }} statement is an example of Angular's interpolation syntax. Interpolation {{ }} lets you render the property value as text.
+5. To make each product name a link to product details, add the <a> element around {{ product.name }}.
+6. Set the title to be the product's name by using the property binding [ ]
+7. In the preview pane, hover over a product name to see the bound name property value, which is the product name plus the word "details". Property binding [ ] lets you use the property value in a template expression.
+8. Add the product descriptions. On a <p> element, use an *ngIf directive so that Angular only creates the <p> element if the current product has a description.
+9. Add a button so users can share a product. Bind the button's click event to the share() method in product-list.component.ts. Event binding uses a set of parentheses, ( ), around the event, as in the (click) event on the <button> element.
+
+Pass data to a child component
+10. Currently, the product list displays the name and description of each product. The ProductListComponent also defines a products property that contains imported data for each product from the products array in products.ts.
+
+The next step is to create a new alert feature that uses product data from the ProductListComponent. The alert checks the product's price, and, if the price is greater than $700, displays a Notify Me button that lets users sign up for notifications when the product goes on sale.
+
+This section walks you through creating a child component, ProductAlertsComponent that can receive data from its parent component, ProductListComponent.
+
+11. Right click on the app folder and use the Angular Generator to generate a new component named product-alerts.
+
+src/app/product-alerts/product-alerts.component.
+12. To set up ProductAlertsComponent to receive product data, first import Input from @angular/core
+13. In the ProductAlertsComponent class definition, define a property named product with an @Input() decorator. The @Input() decorator indicates that the property value passes in from the component's parent, ProductListComponent.
+
+src/app/product-alerts/product-alerts.component.html
+14. Open product-alerts.component.html and replace the placeholder paragraph with a Notify Me button that appears if the product price is over $700.
+15. To display ProductAlertsComponent as a child of ProductListComponent, add the selector, <app-product-alerts> to product-list.component.html. Pass the current product as input to the component using property binding.
+16. The new product alert component takes a product as input from the product list. With that input, it shows or hides the Notify Me button, based on the price of the product. The Phone XL price is over $700, so the Notify Me button appears on that product.
+
+Pass data to a parent component
+17. To make the Notify Me button work, the child component needs to notify and pass the data to the parent component. The ProductAlertsComponent needs to emit an event when the user clicks Notify Me and the ProductListComponent needs to respond to the event.
+18. In product-alerts.component.ts, import Output and EventEmitter from @angular/core
+19. In the component class, define a property named notify with an @Output() decorator and an instance of EventEmitter(). Configuring ProductAlertsComponent with an @Output() allows the ProductAlertsComponent to emit an event when the value of the notify property changes.
+20.In product-alerts.component.html, update the Notify Me button with an event binding to call the notify.emit() method.
+21. Define the behavior that happens when the user clicks the button. The parent, ProductListComponent—not the ProductAlertsComponent—acts when the child raises the event. In product-list.component.ts, define an onNotify() method, similar to the share() method.
+
+src/app/product-list/product-list.component.ts
+
+22. Update the ProductListComponent to receive data from the ProductAlertsComponent.
+
+In product-list.component.html, bind <app-product-alerts> to the onNotify() method of the product list component. <app-product-alerts> is what displays the Notify Me button.
+
+23. Click the Notify Me button to trigger an alert which reads, "You will be notified when the product goes on sale".
+
+
+                  Adding navigation
+24. Type a URL in the address bar to navigate to a corresponding product page.
+Click links on the page to navigate within your single-page application.
+Click the browser's back and forward buttons to navigate the browser history intuitively.
+
+                  Associate a URL path with a component
+25. The application already uses the Angular Router to navigate to the ProductListComponent. This section shows you how to define a route to show individual product details.
+26. Generate a new component for product details. In the file list, right-click the app folder, choose Angular Generator and Component. Name the component product-details.
+27. In app.module.ts, add a route for product details, with a path of products/:productId and ProductDetailsComponent for the component
+28. Open product-list.component.html.
+29. Modify the product name anchor to include a routerLink with the product.id as a parameter.
+30. The RouterLink directive helps you customize the anchor element. In this case, the route, or URL, contains one fixed segment, /products. The final segment is variable, inserting the id property of the current product. For example, the URL for a product with an id of 1 would be similar to https://getting-started-myfork.stackblitz.io/products/1.
+31. Verify that the router works as intended by clicking the product name. The application should display the ProductDetailsComponent, which currently says "product-details works!"
+
+Notice that the URL in the preview window changes. The final segment is products/# where # is the number of the route you clicked.
+
+              View product details
+32. The ProductDetailsComponent handles the display of each product. The Angular Router displays components based on the browser's URL and your defined routes.
+33. you'll use the Angular Router to combine the products data and route information to display the specific details for each product.
+34. In product-details.component.ts, import ActivatedRoute from @angular/router, and the products array from ../products.
+35. Define the product property. line  in src/app/product-details/product-details.component.ts
+36. Inject ActivatedRoute into the constructor() by adding private route: ActivatedRoute as an argument within the constructor's parentheses.
+37. ActivatedRoute is specific to each component that the Angular Router loads. ActivatedRoute contains information about the route and the route's parameters.
+
+By injecting ActivatedRoute, you are configuring the component to use a service. The Managing Data step covers services in more detail.
+38. In the ngOnInit() method, extract the productId from the route parameters and find the corresponding product in the products array.
+38. The route parameters correspond to the path variables you define in the route. To access the route parameters, we use route.snapshot, which is the ActivatedRouteSnapshot that contains information about the active route at that particular moment in time. The URL that matches the route provides the productId . Angular uses the productId to display the details for each unique product.
+39. Update the ProductDetailsComponent template to display product details with an *ngIf. If a product exists, the <div> renders with a name, price, and description.
+40. The line, <h4>{{ product.price | currency }}</h4>, uses the currency pipe to transform product.price from a number to a currency string. A pipe is a way you can transform data in your HTML template. For more information about Angular pipes, see Pipes.
+41. When users click on a name in the product list, the router navigates them to the distinct URL for the product, shows the ProductDetailsComponent, and displays the product details.
+
+
+                Managing data
+42. guides you through creating a shopping cart in the following phases:
+
+Update the product details view to include a Buy button, which adds the current product to a list of products that a cart service manages.
+Add a cart component, which displays the items in the cart.
+Add a shipping component, which retrieves shipping prices for the items in the cart by using Angular's HttpClient to retrieve shipping data from a .json file.
+
+43. Create the shopping cart service: In Angular, a service is an instance of a class that you can make available to any part of your application using Angular's dependency injection system.
+
+Currently, users can view product information, and the application can simulate sharing and notifications about product changes.
+
+The next step is to build a way for users to add products to a cart. This section walks you through adding a Buy button and setting up a cart service to store information about products in the cart.
+44. To generate a cart service, right click on the app folder, choose Angular Generator, and choose Service. Name the new service cart.
+45. In the CartService class, define an items property to store the array of the current products in the cart.
+46. Define methods to add items to the cart, return cart items, and clear the cart items.
+47. The addToCart() method appends a product to an array of items.
+
+The getItems() method collects the items users add to the cart and returns each item with its associated quantity.
+
+The clearCart() method returns an empty array of items, which empties the cart.
+
+        Use the cart service
+48.using the CartService to add a product to the cart.
+49. In product-details.component.ts, import the cart service.
+50. Inject the cart service by adding it to the constructor().
+51. Define the addToCart() method, which adds the current product to the cart.
+52. The addToCart() method does the following:
+
+Takes the current product as an argument.
+Uses the CartService addToCart() method to add the product to the cart.
+Displays a message that you've added a product to the cart.
+53. In product-details.component.html, add a button with the label Buy, and bind the click() event to the addToCart() method. This code updates the product details template with a Buy button that adds the current product to the cart.
+54. Verify that the new Buy button appears as expected by refreshing the application and clicking on a product's name to display its details.
+55. Click the Buy button to add the product to the stored list of items in the cart and display a confirmation message.
+
+                Create the cart view
+55. For customers to see their cart, you can create the cart view in two steps:
+
+Create a cart component and configure routing to the new component.
+Display the cart items.
+
+56. Generate a cart component named cart by right-clicking the app folder, choosing Angular Generator, and Component.
+57. You can ignore the CartComponent ngOnInit() for this tutorial.
+58. open app.module.ts and add a route for the component CartComponent, with a path of cart.
+59. Verify the new CartComponent works as expected by clicking the Checkout button. You can see the "cart works!" 
+
+                Display the cart items
+60. cart service to display the products in the cart.
+61. In cart.component.ts, import the CartService from the cart.service.ts file.
+62. Inject the CartService so that the CartComponent can use it by adding it to the constructor().
+63. Define the items property to store the products in the cart. This code sets the items using the CartService getItems() method. You defined this method when you created cart.service.ts.
+64. Update the cart template with a header, and use a <div> with an *ngFor to display each of the cart items with its name and price. src/app/cart/cart.component.html
+65. Verify that your cart works as expected:
+
+Click My Store
+Click on a product name to display its details.
+Click Buy to add the product to the cart.
+Click Checkout to see the cart.
+
+      Retrieve shipping prices
+66. Servers often return data in the form of a stream. Streams are useful because they make it easy to transform the returned data and make modifications to the way you request that data. Angular HttpClient is a built-in way to fetch data from external APIs and provide them to your application as a stream.
+
+This section shows you how to use HttpClient to retrieve shipping prices from an external file.
+
+The application that StackBlitz generates for this guide comes with predefined shipping data in assets/shipping.json. Use this data to add shipping prices for items in the cart.
+
+            Configure AppModule to use HttpClient
+67. To use Angular's HttpClient, you must configure your application to use HttpClientModule.
+
+Angular's HttpClientModule registers the providers your application needs to use the HttpClient service throughout your application.
+68. In app.module.ts, import HttpClientModule from the @angular/common/http package at the top of the file with the other imports.
+69. To register Angular's HttpClient providers globally, add HttpClientModule to the AppModule @NgModule() imports array.
+
+              Configure CartService to use HttpClient
+70. The next step is to inject the HttpClient service into your service so your application can fetch data and interact with external APIs and resources.
+71. In cart.service.ts, import HttpClient from the @angular/common/http package
+72. Inject HttpClient into the CartService constructor().
+
+                Configure CartService to get shipping prices
+
+73. To get shipping data, from shipping.json, You can use the HttpClient get() method.
+74. In cart.service.ts, below the clearCart() method, define a new getShippingPrices() method that uses the HttpClient get() method.
+
+
+              Create a shipping component
+75. Now that you've configured your application to retrieve shipping data, you can create a place to render that data.
+76. Generate a new component named shipping by right-clicking the app folder, choosing Angular Generator, and selecting Component.
+77. In app.module.ts, add a route for shipping. Specify a path of shipping and a component of ShippingComponent.
+78. There's no link to the new shipping component yet, but you can see its template in the preview pane by entering the URL its route specifies. The URL has the pattern: https://getting-started.stackblitz.io/Shipping
+
+          Configuring the ShippingComponent to use CartService
+79. modifying the ShippingComponent to retrieve shipping data via HTTP from the shipping.json file.
+80. In shipping.component.ts, import CartService.
+81. Inject the cart service in the ShippingComponent constructor().
+82. Define a shippingCosts property that sets the shippingCosts property using the getShippingPrices() method from the CartService.
+83. Update the ShippingComponent template to display the shipping types and prices using the async pipe.
+84. The async pipe returns the latest value from a stream of data and continues to do so for the life of a given component. When Angular destroys that component, the async pipe automatically stops. For detailed information about the async pipe, see the AsyncPipe API documentation.
+85. Add a link from the CartComponent view to the ShippingComponent view.
+86. Click the Checkout button to see the updated cart. Remember that changing the application causes the preview to refresh, which empties the cart.
+87. Click on the link to navigate to the shipping prices.
+
+        Using forms for user input
+88. This section walks you through adding a form-based checkout feature to collect user information as part of checkout.
+
+          Define the checkout form model
+89. This step shows you how to set up the checkout form model in the component class. The form model determines the status of the form.
+90. Open cart.component.ts.
+91. Import the FormBuilder service from the @angular/forms package. This service provides convenient methods for generating controls.
+92. Inject the FormBuilder service in the CartComponent constructor(). This service is part of the ReactiveFormsModule module, which you've already imported.
+93. To gather the user's name and address, use the FormBuilder group() method to set the checkoutForm property to a form model containing name and address fields.
+94. Define an onSubmit() method to process the form. This method allows users to submit their name and address. In addition, this method uses the clearCart() method of the CartService to reset the form and clear the cart.
+
+              Create the checkout form
+95. Use the following steps to add a checkout form at the bottom of the Cart view.
+
+At the bottom of cart.component.html, add an HTML <form> element and a Purchase button.
+
+Use a formGroup property binding to bind checkoutForm to the HTML <form>.
+
+                Create the checkout form
+96. Use the following steps to add a checkout form at the bottom of the Cart view.
+
+At the bottom of cart.component.html, add an HTML <form> element and a Purchase button.
+
+Use a formGroup property binding to bind checkoutForm to the HTML <form>.
+97. On the form tag, use an ngSubmit event binding to listen for the form submission and call the onSubmit() method with the checkoutForm value.
+98. Add <input> fields for name and address, each with a formControlName attribute that binds to the checkoutForm form controls for name and address to their <input> fields.
+99. After putting a few items in the cart, users can review their items, enter their name and address, and submit their purchase.
+100. You have a complete online store application with a product catalog, a shopping cart, and a checkout function.
+
+Continue to the "Deployment" section to move to local development, or deploy your app to Firebase or your own server.
+
